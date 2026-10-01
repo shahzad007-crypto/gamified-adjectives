@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Alibi Detective: Operation Degrees of Comparison</title>
+    <style>
+        :root {
+            --bg-base: #0b1120;
+            --bg-card: #131d33;
+            --bg-elevated: #1a2744;
+            --bg-input: #0f172a;
+            --accent-gold: #f59e0b;
+            --accent-gold-hover: #d97706;
+            --accent-cyan: #38bdf8;
+            --accent-purple: #c084fc;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-subtle: #243556;
+            --border-active: #475569;
+            --locked-color: #f59e0b;
+            --locked-bg: rgba(245, 158, 11, 0.14);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            --shadow-elevation: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header.hud {
+            background-color: var(--bg-card);
+            border-bottom: 2px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .hud-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .detective-branding {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .badge-crest {
+            width: 44px;
+            height: 44px;
+            background: radial-gradient(circle, #f59e0b 20%, #78350f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            border: 2px solid #fbbf24;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .case-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .case-subtitle {
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .hud-meta-group {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .student-pill {
+            background-color: var(--bg-elevated);
+            padding: 0.4rem 0.9rem;
+            border-radius: 9999px;
+            border: 1px solid var(--border-subtle);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timer-badge {
+            background-color: #030712;
+            border: 1px solid #374151;
+            padding: 0.35rem 0.85rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .timer-btn {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timer-btn:hover {
+            color: #fff;
+            border-color: var(--accent-gold);
+        }
+
+        nav.stage-progress {
+            background-color: #0d1424;
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.6rem 1rem;
+        }
+
+        .stepper-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .stepper-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 4%;
+            right: 4%;
+            height: 2px;
+            background-color: var(--border-subtle);
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .step-bubble {
+            position: relative;
+            z-index: 2;
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .step-bubble.current {
+            background-color: var(--accent-gold);
+            color: #000;
+            border-color: #fbbf24;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+
+        .step-bubble.done {
+            background-color: #1e293b;
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
+        main.app-shell {
+            flex: 1;
+            max-width: 1000px;
+            width: 100%;
+            margin: 1.75rem auto;
+            padding: 0 1.25rem 3rem;
+        }
+
+        .dossier-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-elevation);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stage-header {
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stage-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .stage-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+        }
+
+        .stage-tag {
+            background-color: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--accent-gold);
+            font-size: 0.78rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .evidence-dossier-box {
+            background-color: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .case-prompt {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .concept-cue {
+            background: rgba(56, 189, 248, 0.08);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 0.6rem 0.9rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.85rem;
+            color: #bae6fd;
+            margin-bottom: 1.25rem;
+        }
+
+        .options-stack {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .options-stack.grid-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .opt-btn {
+            background-color: #17233f;
+            border: 2px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 0.9rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: var(--accent-gold);
+            background-color: #1c2b4c;
+        }
+
+        /* STRICT LOCK-AND-PROCEED: Neutral selection indicator */
+        .opt-btn.is-locked {
+            border-color: var(--locked-color) !important;
+            background-color: var(--locked-bg) !important;
+            color: #fff !important;
+            box-shadow: 0 0 0 1px var(--locked-color);
+        }
+
+        .opt-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+
+        .opt-btn .lock-indicator {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            display: none;
+        }
+
+        .opt-btn.is-locked .lock-indicator {
+            display: inline-block;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .lock-status-note {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .btn-proceed {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
+            color: #000;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.75rem 1.6rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-proceed:disabled {
+            background: #334155;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+
+        .btn-proceed:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .multi-gap-sentence {
+            font-size: 1.15rem;
+            line-height: 2.2;
+            background: #0d1424;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 1.25rem;
+        }
+
+        .case-select {
+            background-color: var(--bg-elevated);
+            color: var(--accent-gold);
+            border: 2px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            font-size: 1rem;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .case-select:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .case-select:disabled {
+            background-color: #111a2e;
+            color: #e2e8f0;
+            border-color: var(--accent-gold);
+            cursor: not-allowed;
+        }
+
+        .forensic-text-card {
+            background: #0d1424;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-size: 1.15rem;
+            line-height: 2.2;
+            margin-bottom: 1.25rem;
+        }
+
+        .forensic-token {
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-block;
+        }
+
+        .forensic-token:hover:not(.locked) {
+            background-color: rgba(245, 158, 11, 0.2);
+            text-decoration: underline;
+        }
+
+        .forensic-token.selected-locked {
+            background-color: rgba(245, 158, 11, 0.35);
+            border-bottom: 2px solid var(--accent-gold);
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .forensic-token.locked {
+            cursor: default;
+        }
+
+        .scramble-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            padding: 1rem;
+            background: #0d1424;
+            border: 1px dashed var(--border-subtle);
+            border-radius: 8px;
+            min-height: 70px;
+            margin-bottom: 1rem;
+        }
+
+        .scramble-target {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            padding: 1rem;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-subtle);
+            border-radius: 8px;
+            min-height: 70px;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .tile-word {
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s;
+        }
+
+        .tile-word:hover:not(.locked) {
+            border-color: var(--accent-gold);
+            background-color: #334155;
+            transform: translateY(-2px);
+        }
+
+        .tile-word.locked {
+            cursor: not-allowed;
+            opacity: 0.85;
+            background-color: #162035;
+            border-color: var(--accent-gold);
+        }
+
+        .login-wrap {
+            max-width: 520px;
+            margin: 3rem auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-elevation);
+            text-align: center;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .rating-badge {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .rating-master {
+            background-color: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #34d399;
+        }
+
+        .rating-senior {
+            background-color: rgba(56, 189, 248, 0.15);
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+        }
+
+        .rating-cadet {
+            background-color: rgba(245, 158, 11, 0.15);
+            border: 1px solid #f59e0b;
+            color: #fbbf24;
+        }
+
+        .review-table-wrap {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+        }
+
+        table.dossier-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        table.dossier-table th {
+            background-color: #0d1424;
+            color: var(--text-muted);
+            padding: 0.85rem 1rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        table.dossier-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+            vertical-align: top;
+        }
+
+        table.dossier-table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .status-pill.correct {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+
+        .status-pill.incorrect {
+            background: rgba(244, 63, 94, 0.2);
+            color: #f43f5e;
+            border: 1px solid #f43f5e;
+        }
+
+        .user-msg-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1e293b;
+            border: 1px solid var(--accent-gold);
+            color: #fff;
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @media print {
+            header.hud, nav.stage-progress, .action-row, .no-print, .user-msg-box {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .dossier-card {
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+                background: #ffffff !important;
+            }
+            table.dossier-table th {
+                background-color: #f1f5f9 !important;
+                color: #000000 !important;
+                border-bottom: 2px solid #334155 !important;
+            }
+            table.dossier-table td {
+                color: #000000 !important;
+                border-bottom: 1px solid #cbd5e1 !important;
+            }
+            .rating-badge {
+                border: 2px solid #000000 !important;
+                color: #000000 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Notification Toast Box (No alert() usage) -->
+    <div id="user-alert-toast" class="user-msg-box"></div>
+
+    <header class="hud">
+        <div class="hud-wrap">
+            <div class="detective-branding">
+                <div class="badge-crest">⚖️</div>
+                <div>
+                    <div class="case-title">The Alibi Detective</div>
+                    <div class="case-subtitle">Operation Degrees of Comparison • CEFR A2–B1</div>
+                    <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 600;">Prepared by Muhammad Shahzad_utas _ibra_2026=2027</div>
+                </div>
+            </div>
+
+            <div class="hud-meta-group">
+                <div class="student-pill" id="hud-student-tag" style="display: none;">
+                    <span>Cadet:</span>
+                    <strong id="hud-name-display" style="color: var(--accent-gold);">Officer</strong>
+                </div>
+
+                <div class="timer-badge">
+                    <span id="timer-display">60:00</span>
+                    <button class="timer-btn" id="timer-toggle-btn" title="Pause / Resume Timer">⏸</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stage Progress Indicator (6 Progressive Phases + Final Dossier) -->
+    <nav class="stage-progress" id="stage-nav-bar" style="display: none;">
+        <div class="stepper-container">
+            <div class="step-bubble current" id="step-node-1" title="Positive Degree">1</div>
+            <div class="step-bubble" id="step-node-2" title="Comparative Degree">2</div>
+            <div class="step-bubble" id="step-node-3" title="Superlative Degree">3</div>
+            <div class="step-bubble" id="step-node-4" title="Dual Clause Comparison">4</div>
+            <div class="step-bubble" id="step-node-5" title="Forensic Error Hunt">5</div>
+            <div class="step-bubble" id="step-node-6" title="Trial Scramble">6</div>
+            <div class="step-bubble" id="step-node-7" title="Final Dossier">★</div>
+        </div>
+    </nav>
+
+    <main class="app-shell">
+
+        <!-- ================= LOGIN SCREEN ================= -->
+        <section id="screen-login" class="login-wrap">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔎</div>
+            <h2 style="color: #fff; margin-bottom: 0.35rem;">Degrees of Comparison Investigation Unit</h2>
+            <div style="font-size: 0.82rem; color: var(--accent-gold); font-weight: 700; margin-bottom: 0.75rem; letter-spacing: 0.5px;">
+                Prepared by Muhammad Shahzad_utas _ibra_2026=2027
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                Official Foundation English Forensic Diagnostic: Positive, Comparative (-er / more / than), and Superlative (the -est / the most / in-of) Degrees of Comparison. Enter your cadet credentials to open the 6-stage case dossier.
+            </p>
+
+            <form id="login-form" onsubmit="handleStartGame(event)">
+                <div class="form-group">
+                    <label class="form-label" for="input-name">Student Full Name</label>
+                    <input type="text" id="input-name" class="form-input" placeholder="e.g., Tariq Al-Busaidi" required autocomplete="name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="input-section">Student ID / University Campus & Section</label>
+                    <input type="text" id="input-section" class="form-input" placeholder="e.g., UTAS-Ibra / Foundation B1 - Sec 3" required>
+                </div>
+
+                <div style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--accent-gold); padding: 0.75rem; border-radius: 4px; margin-bottom: 1.5rem; text-align: left; font-size: 0.82rem; color: #fde68a;">
+                    <strong>Strict Forensic Examination Rules:</strong><br>
+                    • One attempt only per question: your selection locks immediately upon clicking.<br>
+                    • Grades and linguistic explanations remain confidential until the final case dossier.
+                </div>
+
+                <button type="submit" class="btn-proceed" style="width: 100%; justify-content: center;">
+                    Authorize Credentials & Open Dossier →
+                </button>
+            </form>
+        </section>
+
+        <!-- ================= GAMEPLAY CONTAINER ================= -->
+        <section id="screen-gameplay" style="display: none;">
+            <div class="dossier-card">
+                
+                <div class="stage-header">
+                    <div>
+                        <h3 class="stage-title" id="stage-title-text">Stage 1: The Baseline Ledger</h3>
+                        <p class="stage-desc" id="stage-desc-text">Positive Degree & Equative Structures (as... as / not as... as / base adjectives).</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
+                        <span class="stage-tag" id="stage-badge-text">STAGE 1 OF 6</span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;" id="question-tracker">Item 1 of 10</span>
+                    </div>
+                </div>
+
+                <!-- Dynamic Question Body Injected Here -->
+                <div id="dynamic-stage-body"></div>
+
+                <!-- Action & Navigation Bar -->
+                <div class="action-row">
+                    <span class="lock-status-note" id="lock-status-text">Select an option to immediately lock your answer.</span>
+                    <button class="btn-proceed" id="btn-next-question" disabled onclick="handleProceedNext()">
+                        Submit & Next Item →
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= FINAL COMPREHENSIVE DOSSIER ================= -->
+        <section id="screen-dossier" style="display: none;">
+            <div class="dossier-card">
+                <div style="text-align: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📜</div>
+                    <h2 style="color: #fff; font-size: 1.7rem; text-transform: uppercase; letter-spacing: 1px;">Official Forensic Evaluation Dossier</h2>
+                    <p style="color: var(--accent-gold); font-weight: 700; font-size: 0.95rem;">Adjective Degrees Forensic Division • UTAS-Ibra</p>
+                    <p style="color: #94a3b8; font-size: 0.82rem; font-weight: 600; margin-top: 0.35rem;">Prepared by Muhammad Shahzad_utas _ibra_2026=2027</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; background: var(--bg-elevated); padding: 1.25rem; border-radius: 8px;">
+                    <div>
+                        <div class="form-label">Cadet Name</div>
+                        <div style="font-size: 1.1rem; font-weight: 800; color: #fff;" id="dossier-student-name">-</div>
+                    </div>
+                    <div>
+                        <div class="form-label">ID / Campus & Section</div>
+                        <div style="font-size: 1.1rem; font-weight: 800; color: #fff;" id="dossier-student-section">-</div>
+                    </div>
+                    <div>
+                        <div class="form-label">Total Score</div>
+                        <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-gold);" id="dossier-score-text">0 / 60 (0%)</div>
+                    </div>
+                    <div>
+                        <div class="form-label">Diagnostic Rank</div>
+                        <div id="dossier-rank-container"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="color: #fff; margin-bottom: 0.5rem;">Item-by-Item Socratic Grammar Breakdown</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                        Review your locked answers alongside target comparative rules and detailed linguistic explanations.
+                    </p>
+
+                    <div class="review-table-wrap">
+                        <table class="dossier-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">#</th>
+                                    <th style="width: 15%;">Stage & Phase</th>
+                                    <th style="width: 30%;">Question Context</th>
+                                    <th style="width: 15%;">Your Locked Choice</th>
+                                    <th style="width: 15%;">Correct Answer</th>
+                                    <th style="width: 20%;">Linguistic Explanation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dossier-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem;" class="no-print">
+                    <button class="btn-proceed" style="background: #334155; color: #fff;" onclick="window.print()">
+                        🖨️ Print / Save PDF Dossier
+                    </button>
+                    <button class="btn-proceed" onclick="location.reload()">
+                        🔄 Retake Investigation Session
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        class DetectiveAudioEngine {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+                }
+            }
+
+            playTone(freq, type, duration, gainLevel = 0.12) {
+                try {
+                    this.init();
+                    if (this.ctx.state === 'suspended') this.ctx.resume();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(gainLevel, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+
+            lockSound() {
+                this.playTone(480, 'sine', 0.08, 0.1);
+            }
+
+            advanceSound() {
+                this.playTone(600, 'triangle', 0.1, 0.08);
+            }
+
+            fanfare() {
+                [440, 554, 659, 880].forEach((f, idx) => {
+                    setTimeout(() => this.playTone(f, 'triangle', 0.4, 0.15), idx * 100);
+                });
+            }
+        }
+
+        const audio = new DetectiveAudioEngine();
+
+        function showToast(msg) {
+            const toast = document.getElementById('user-alert-toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        const GameData = {
+            studentName: "",
+            studentSection: "",
+            timerSeconds: 3600, // 60:00
+            timerRunning: true,
+            timerInterval: null,
+            
+            currentStage: 1,
+            currentQuestionIdx: 0,
+            lockedAnswerForCurrent: null,
+            userSubmissions: [],
+
+            // ================= STAGE 1: THE BASELINE LEDGER (Positive Degree & Equatives) [10 Items] =================
+            stage1: [
+                {
+                    id: "S1-1",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Positive Degree (Base Form)",
+                    conceptCue: "Concept Cue: Positive degree describes a single person, place, or thing without comparing it to another.",
+                    prompt: "The ancient defensive walls surrounding Nizwa Fort are remarkably ______.",
+                    options: ["thick", "thicker", "thickest", "more thick"],
+                    correct: "thick",
+                    explanation: "Positive degree: only one entity ('defensive walls') is being described without comparison, requiring base form 'thick'."
+                },
+                {
+                    id: "S1-2",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Equative (as... as)",
+                    conceptCue: "Concept Cue: Between 'as' and 'as', always use the positive (base) degree of the adjective.",
+                    prompt: "Witness statement: 'The getaway car was not as ______ as the patrol vehicle.'",
+                    options: ["fast", "faster", "fastest", "more fast"],
+                    correct: "fast",
+                    explanation: "In equative comparisons ('as... as' or 'not as... as'), use the positive base form: 'as fast as'."
+                },
+                {
+                    id: "S1-3",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Equative (as... as)",
+                    conceptCue: "Concept Cue: Paired structure indicating equal quality uses 'as + base adjective + as'.",
+                    prompt: "The silver Khanjar found in the souq is as ______ as the museum exhibit.",
+                    options: ["valuable", "more valuable", "most valuable", "valuable than"],
+                    correct: "valuable",
+                    explanation: "The correlative structure 'as... as' encloses the uninflected base adjective ('valuable')."
+                },
+                {
+                    id: "S1-4",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Positive Degree (Base Form)",
+                    conceptCue: "Concept Cue: Modifiers like 'very', 'extremely', and 'quite' take the base positive adjective.",
+                    prompt: "Officer Khalid noticed that the footprints near the date palm grove were very ______.",
+                    options: ["deep", "deeper", "deepest", "more deep"],
+                    correct: "deep",
+                    explanation: "Intensifiers like 'very' modify the positive base degree ('very deep'), not comparative or superlative forms."
+                },
+                {
+                    id: "S1-5",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Equative (not as... as)",
+                    conceptCue: "Concept Cue: Check the correlative partner word after the base adjective.",
+                    prompt: "The mountain trail to Jebel Akhdar is not as steep ______ the trail up Jebel Shams.",
+                    options: ["as", "than", "that", "like"],
+                    correct: "as",
+                    explanation: "The equative construction is 'not as + adjective + as'. Never use 'than' with 'as'."
+                },
+                {
+                    id: "S1-6",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Positive Degree (Sense Verbs)",
+                    conceptCue: "Concept Cue: Sense verbs like 'look', 'sound', 'smell', 'feel' take positive adjectives, not adverbs or comparatives.",
+                    prompt: "The suspect's alibi sounded completely ______ to the senior investigator.",
+                    options: ["convincing", "more convincing", "most convincing", "convincingly"],
+                    correct: "convincing",
+                    explanation: "The linking sense verb 'sounded' is followed by the positive predicate adjective 'convincing'."
+                },
+                {
+                    id: "S1-7",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Equative (as... as with Irregular)",
+                    conceptCue: "Concept Cue: 'Good' is the base form; 'better' is comparative and 'best' is superlative.",
+                    prompt: "The security lighting in the rear alleyway is just as ______ as the lighting at the front entrance.",
+                    options: ["good", "better", "best", "well"],
+                    correct: "good",
+                    explanation: "Equative 'as... as' takes the positive base adjective 'good' ('as good as')."
+                },
+                {
+                    id: "S1-8",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Positive Degree (Pre-nominal)",
+                    conceptCue: "Concept Cue: Simple attributive adjective modifying a singular noun.",
+                    prompt: "The forensics team discovered a ______ piece of fabric caught on the iron gate.",
+                    options: ["tiny", "tinier", "tiniest", "more tiny"],
+                    correct: "tiny",
+                    explanation: "The base form 'tiny' is used attributively before 'piece' when no direct comparison is made."
+                },
+                {
+                    id: "S1-9",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Equative (not so / not as)",
+                    conceptCue: "Concept Cue: Equative comparison with irregular negative base 'bad'.",
+                    prompt: "The dust storm in Ibra yesterday was not as ______ as the storm in Thamrait.",
+                    options: ["bad", "worse", "worst", "baddest"],
+                    correct: "bad",
+                    explanation: "Between 'as... as', the positive base form 'bad' must be used ('not as bad as'). 'Worse' is comparative."
+                },
+                {
+                    id: "S1-10",
+                    stage: "Stage 1: The Baseline Ledger",
+                    phase: "Positive Degree (Compound)",
+                    conceptCue: "Concept Cue: Descriptive positive adjective after linking verb 'is'.",
+                    prompt: "The historic Falaj irrigation channel near the crime scene is still ______ today.",
+                    options: ["functional", "more functional", "functionaler", "most functional"],
+                    correct: "functional",
+                    explanation: "Describing the current state of a single subject requires the positive base adjective 'functional'."
+                }
+            ],
+
+            // ================= STAGE 2: THE TWO-SUSPECT MATRIX (Comparative Degree) [10 Items] =================
+            stage2: [
+                {
+                    id: "S2-1",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (-er + than)",
+                    conceptCue: "Concept Cue: Single-syllable adjectives form the comparative by adding '-er' followed by 'than'.",
+                    prompt: "The watchtower in Bahla is ______ than the sentry post in Tanuf.",
+                    options: ["taller", "more tall", "tallest", "more taller"],
+                    correct: "taller",
+                    explanation: "'Tall' is a one-syllable adjective; its comparative is 'taller + than'. Avoid double comparatives like 'more taller'."
+                },
+                {
+                    id: "S2-2",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (Spelling: CVC Doubling)",
+                    conceptCue: "Concept Cue: One-syllable adjectives ending in consonant-vowel-consonant double the final consonant before '-er'.",
+                    prompt: "The contraband crate found in Muscat was ______ than the box seized in Sohar.",
+                    options: ["bigger", "biger", "more big", "biggest"],
+                    correct: "bigger",
+                    explanation: "'Big' ends in consonant-vowel-consonant (b-i-g); double the 'g' before adding '-er': 'bigger'."
+                },
+                {
+                    id: "S2-3",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (Spelling: -y to -ier)",
+                    conceptCue: "Concept Cue: Two-syllable adjectives ending in consonant + 'y' change 'y' to 'i' and add '-er'.",
+                    prompt: "The suspect claimed his metal suitcase was ______ than the courier's leather bag.",
+                    options: ["heavier", "heavyer", "more heavy", "heaviest"],
+                    correct: "heavier",
+                    explanation: "Adjectives ending in consonant + y ('heavy') drop the 'y' and take '-ier' ('heavier')."
+                },
+                {
+                    id: "S2-4",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (Multi-syllable: more + than)",
+                    conceptCue: "Concept Cue: Adjectives of three or more syllables use 'more + base adjective + than'.",
+                    prompt: "Gold jewelry stolen from the shop is ______ than the brass ornaments.",
+                    options: ["more expensive", "expensiver", "most expensive", "more expensiver"],
+                    correct: "more expensive",
+                    explanation: "'Expensive' is a three-syllable adjective; its comparative is formed with 'more' ('more expensive than')."
+                },
+                {
+                    id: "S2-5",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (Irregular: good -> better)",
+                    conceptCue: "Concept Cue: The comparative form of 'good' is completely irregular.",
+                    prompt: "The detective's memory of the license plate was ______ than the security guard's note.",
+                    options: ["better", "gooder", "more good", "best"],
+                    correct: "better",
+                    explanation: "'Good' is irregular; its comparative degree is 'better'. 'Gooder' is ungrammatical."
+                },
+                {
+                    id: "S2-6",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (Irregular: bad -> worse)",
+                    conceptCue: "Concept Cue: The comparative form of 'bad' is completely irregular.",
+                    prompt: "The weather conditions in the desert during the chase were ______ than expected.",
+                    options: ["worse", "badder", "worser", "more bad"],
+                    correct: "worse",
+                    explanation: "'Bad' has the irregular comparative form 'worse'. 'Badder' and 'worser' do not exist in standard English."
+                },
+                {
+                    id: "S2-7",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative Connector (than vs then)",
+                    conceptCue: "Concept Cue: Comparisons use the conjunction 'than', not the time adverb 'then'.",
+                    prompt: "Officer Salim was much quicker to respond ______ the private security patrol.",
+                    options: ["than", "then", "that", "from"],
+                    correct: "than",
+                    explanation: "The comparative conjunction is 'than' ('quicker than'). 'Then' refers to time sequence."
+                },
+                {
+                    id: "S2-8",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (Irregular: far -> farther/further)",
+                    conceptCue: "Concept Cue: When comparing physical geographical distance, use 'farther' or 'further'.",
+                    prompt: "The border outpost at Al Wajajah is ______ from Nizwa than the checkpoint in Bidbid.",
+                    options: ["farther", "farer", "more far", "farthest"],
+                    correct: "farther",
+                    explanation: "'Far' has irregular comparative forms 'farther' (physical distance) and 'further'. 'Farer' is incorrect."
+                },
+                {
+                    id: "S2-9",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (Two-syllable with -er)",
+                    conceptCue: "Concept Cue: Two-syllable adjectives ending in '-ow', '-le', '-er' often take '-er'.",
+                    prompt: "The passage behind the fortress wall is ______ than the main corridor.",
+                    options: ["narrower", "more narrow", "narrowest", "more narrower"],
+                    correct: "narrower",
+                    explanation: "'Narrow' ends in '-ow' and typically forms its comparative with '-er' ('narrower than')."
+                },
+                {
+                    id: "S2-10",
+                    stage: "Stage 2: The Two-Suspect Matrix",
+                    phase: "Comparative (less + than)",
+                    conceptCue: "Concept Cue: The opposite of 'more + adjective' is 'less + adjective + than'.",
+                    prompt: "The second alibi offered by suspect Tariq was ______ credible than his first account.",
+                    options: ["less", "lesser", "least", "fewer"],
+                    correct: "less",
+                    explanation: "To express a lower degree before an adjective ('credible'), use 'less + adjective + than'."
+                }
+            ],
+
+            // ================= STAGE 3: THE SUPREME SUSPECT (Superlative Degree) [10 Items] =================
+            stage3: [
+                {
+                    id: "S3-1",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative (the -est)",
+                    conceptCue: "Concept Cue: Comparing one item against all others in a group requires 'the + adjective-est'.",
+                    prompt: "Jebel Shams is ______ peak in the entire Sultanate of Oman.",
+                    options: ["the highest", "highest", "the most high", "the higher"],
+                    correct: "the highest",
+                    explanation: "Superlative of one-syllable 'high' requires the definite article 'the' plus '-est': 'the highest'."
+                },
+                {
+                    id: "S3-2",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative (the most + multi-syllable)",
+                    conceptCue: "Concept Cue: Adjectives of 3+ syllables take 'the most' before the base adjective.",
+                    prompt: "The stolen dagger was ______ artifact stored in the municipal vault.",
+                    options: ["the most valuable", "most valuable", "the valuablest", "the more valuable"],
+                    correct: "the most valuable",
+                    explanation: "For three-syllable 'valuable', the superlative requires 'the most valuable'."
+                },
+                {
+                    id: "S3-3",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative (Irregular: good -> the best)",
+                    conceptCue: "Concept Cue: 'Good' has the irregular superlative form 'the best'.",
+                    prompt: "Sergeant Said is ______ forensic investigator in the regional division.",
+                    options: ["the best", "the goodest", "the most good", "the better"],
+                    correct: "the best",
+                    explanation: "The irregular superlative of 'good' is 'the best'. 'Goodest' is non-standard English."
+                },
+                {
+                    id: "S3-4",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative Preposition (in vs of)",
+                    conceptCue: "Concept Cue: Use 'in' with locations, institutions, and singular collective places ('in Oman', 'in the world').",
+                    prompt: "Bahla Fort is the oldest UNESCO fortress ______ the Sultanate.",
+                    options: ["in", "of", "from", "at"],
+                    correct: "in",
+                    explanation: "With physical locations, countries, and groups, superlatives take 'in' ('in the Sultanate')."
+                },
+                {
+                    id: "S3-5",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative Preposition (of all)",
+                    conceptCue: "Concept Cue: Use 'of' when comparing out of a plural set ('of all the suspects').",
+                    prompt: "Tariq proved to be the most elusive ______ all three suspects.",
+                    options: ["of", "in", "than", "between"],
+                    correct: "of",
+                    explanation: "When referring to a plural group, use 'of' ('of all three suspects')."
+                },
+                {
+                    id: "S3-6",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative (Spelling: -y to -iest)",
+                    conceptCue: "Concept Cue: Two-syllable adjectives ending in consonant + 'y' change 'y' to 'i' and add '-est'.",
+                    prompt: "Thursday evening is usually ______ night of the week in Nizwa Souq.",
+                    options: ["the busiest", "the busyest", "the most busy", "the busier"],
+                    correct: "the busiest",
+                    explanation: "Two-syllable 'busy' changes '-y' to '-i' and adds '-est' with definite article: 'the busiest'."
+                },
+                {
+                    id: "S3-7",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative (Irregular: bad -> the worst)",
+                    conceptCue: "Concept Cue: 'Bad' changes to 'the worst' in the superlative degree.",
+                    prompt: "This is ______ breach of museum security we have recorded this decade.",
+                    options: ["the worst", "the baddest", "the worstest", "the worse"],
+                    correct: "the worst",
+                    explanation: "'Bad' has irregular forms: bad - worse - the worst."
+                },
+                {
+                    id: "S3-8",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative (One of the most...)",
+                    conceptCue: "Concept Cue: The construction 'one of the + superlative' is followed by a plural noun.",
+                    prompt: "Nizwa Fort is one of ______ tourist landmarks in Al Dakhiliyah.",
+                    options: ["the most popular", "most popular", "the popularest", "the more popular"],
+                    correct: "the most popular",
+                    explanation: "The formula is 'one of + the most + adjective + plural noun' ('one of the most popular landmarks')."
+                },
+                {
+                    id: "S3-9",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative (the least + adjective)",
+                    conceptCue: "Concept Cue: The superlative of 'little' is 'the least', expressing the lowest degree.",
+                    prompt: "Of all four vehicles stopped at the roadblock, the white sedan was ______ suspicious.",
+                    options: ["the least", "the less", "least", "the lesser"],
+                    correct: "the least",
+                    explanation: "Superlative of inferior degree requires 'the least + adjective' ('the least suspicious')."
+                },
+                {
+                    id: "S3-10",
+                    stage: "Stage 3: The Supreme Suspect",
+                    phase: "Superlative (Spelling: CVC doubling)",
+                    conceptCue: "Concept Cue: Single syllable ending in CVC doubles the consonant: hot -> the hottest.",
+                    prompt: "July was ______ month recorded during the entire forensic field operation.",
+                    options: ["the hottest", "the hotest", "the most hot", "the hotter"],
+                    correct: "the hottest",
+                    explanation: "CVC adjective 'hot' doubles the final 't' before adding '-est': 'the hottest'."
+                }
+            ],
+
+            // ================= STAGE 4: CROSS-EXAMINATION MATRIX (Dual Drop-Down Clauses) [10 Items] =================
+            stage4: [
+                {
+                    id: "S4-1",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Equative vs Comparative)",
+                    conceptCue: "Concept Cue: First clause uses 'as... as'; second clause compares two entities with 'than'.",
+                    clauseA_prefix: "The gold merchant's safe was as ",
+                    gap1_options: ["secure", "securer", "most secure"],
+                    clause_mid: " as a bank vault, but the thieves were ",
+                    gap2_options: ["cleverer than", "clever than", "most clever"],
+                    clause_end: " the security designers expected.",
+                    correct1: "secure",
+                    correct2: "cleverer than",
+                    explanation: "Clause 1: equative base 'secure' ('as secure as'). Clause 2: comparative 'cleverer than'."
+                },
+                {
+                    id: "S4-2",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Comparative vs Superlative)",
+                    conceptCue: "Concept Cue: Check whether comparing two items ('than') or identifying the extreme among all ('in Oman').",
+                    clauseA_prefix: "The northern mountain pass is ",
+                    gap1_options: ["narrower than", "the narrowest", "narrow as"],
+                    clause_mid: " the coastal highway, making it ",
+                    gap2_options: ["the most dangerous", "more dangerous", "dangerous than"],
+                    clause_end: " route in the region.",
+                    correct1: "narrower than",
+                    correct2: "the most dangerous",
+                    explanation: "Gap 1 compares two roads ('narrower than'). Gap 2 identifies the extreme route in the region ('the most dangerous')."
+                },
+                {
+                    id: "S4-3",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Irregular Comparative & Superlative)",
+                    conceptCue: "Concept Cue: 'Good' -> 'better than'; 'bad' -> 'the worst'.",
+                    clauseA_prefix: "Forensic evidence is always ",
+                    gap1_options: ["better than", "gooder than", "best than"],
+                    clause_mid: " witness hearsay, especially when investigating ",
+                    gap2_options: ["the worst", "the baddest", "worse than"],
+                    clause_end: " crimes in the governorate.",
+                    correct1: "better than",
+                    correct2: "the worst",
+                    explanation: "'Better than' is the correct irregular comparative; 'the worst' is the irregular superlative."
+                },
+                {
+                    id: "S4-4",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Equative & Connector)",
+                    conceptCue: "Concept Cue: 'as + adjective + as' paired with comparative connector 'than'.",
+                    clauseA_prefix: "Suspect Ahmed is not as ",
+                    gap1_options: ["tall", "taller", "tallest"],
+                    clause_mid: " as suspect Salim, yet he ran much faster ",
+                    gap2_options: ["than", "then", "as"],
+                    clause_end: " both officers on duty.",
+                    correct1: "tall",
+                    correct2: "than",
+                    explanation: "Equative base form 'tall' ('not as tall as'); comparative connector 'faster than'."
+                },
+                {
+                    id: "S4-5",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Multi-syllable Comparative & Domain Prep)",
+                    conceptCue: "Concept Cue: 'more difficult than' for comparative; 'in' for location domain.",
+                    clauseA_prefix: "Decoding encrypted radio signals is ",
+                    gap1_options: ["more difficult than", "difficulter than", "most difficult"],
+                    clause_mid: " checking physical logs, particularly ",
+                    gap2_options: ["in", "of", "from"],
+                    clause_end: " an active cyber investigation.",
+                    correct1: "more difficult than",
+                    correct2: "in",
+                    explanation: "'Difficult' takes 'more difficult than'; domain preposition before singular context is 'in'."
+                },
+                {
+                    id: "S4-6",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Two comparatives in parallel)",
+                    conceptCue: "Concept Cue: Check the spelling rules for two one-syllable comparatives.",
+                    clauseA_prefix: "The night patrol was ",
+                    gap1_options: ["colder than", "more cold than", "coldest than"],
+                    clause_mid: " daytime surveillance, and the terrain was ",
+                    gap2_options: ["rougher than", "more rough than", "roughest than"],
+                    clause_end: " the officers anticipated.",
+                    correct1: "colder than",
+                    correct2: "rougher than",
+                    explanation: "Both 'cold' and 'rough' are single-syllable adjectives taking regular '-er + than'."
+                },
+                {
+                    id: "S4-7",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Superlative & Preposition of Plural)",
+                    conceptCue: "Concept Cue: Superlative requires 'the + most/est'; plural set takes 'of all'.",
+                    clauseA_prefix: "The carved silver Khanjar is ",
+                    gap1_options: ["the most historic", "more historic", "historicker"],
+                    clause_mid: " artifact ",
+                    gap2_options: ["of", "in", "than"],
+                    clause_end: " all the confiscated items.",
+                    correct1: "the most historic",
+                    correct2: "of",
+                    explanation: "Superlative 'the most historic' + preposition 'of' before a plural set ('of all the confiscated items')."
+                },
+                {
+                    id: "S4-8",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Spelling -y to -ier & Superlative article)",
+                    conceptCue: "Concept Cue: 'early' -> 'earlier than'; superlative requires definite article 'the'.",
+                    clauseA_prefix: "The forensic team arrived ",
+                    gap1_options: ["earlier than", "earlyer than", "more early than"],
+                    clause_mid: " the detective squad to secure ",
+                    gap2_options: ["the most critical", "most critical", "more critical"],
+                    clause_end: " physical evidence.",
+                    correct1: "earlier than",
+                    correct2: "the most critical",
+                    explanation: "'Early' changes 'y' to 'i' ('earlier than'); superlative requires article 'the' ('the most critical')."
+                },
+                {
+                    id: "S4-9",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Less than vs Least)",
+                    conceptCue: "Concept Cue: Comparing two entities with 'less'; comparing across all with 'the least'.",
+                    clauseA_prefix: "The alleyway security camera is ",
+                    gap1_options: ["less reliable than", "least reliable than", "lesser reliable"],
+                    clause_mid: " the gate scanner, but it was ",
+                    gap2_options: ["the least expensive", "less expensive", "least expensive"],
+                    clause_end: " device installed.",
+                    correct1: "less reliable than",
+                    correct2: "the least expensive",
+                    explanation: "Two items compared: 'less reliable than'. Entire installation group compared: 'the least expensive'."
+                },
+                {
+                    id: "S4-10",
+                    stage: "Stage 4: Cross-Examination Matrix",
+                    phase: "Dual Drop-Down (Farther than & In the world)",
+                    conceptCue: "Concept Cue: Irregular physical distance comparative 'farther than'; superlative domain 'in the world'.",
+                    clauseA_prefix: "The fugitive fled ",
+                    gap1_options: ["farther than", "farer than", "further as"],
+                    clause_mid: " any suspect before, hiding in ",
+                    gap2_options: ["the hottest", "hottest", "most hot"],
+                    clause_end: " desert expanse in Oman.",
+                    correct1: "farther than",
+                    correct2: "the hottest",
+                    explanation: "Distance comparative: 'farther than'. Superlative with CVC doubling: 'the hottest'."
+                }
+            ],
+
+            // ================= STAGE 5: FORENSIC TEXT ANALYSIS (Spot the Error) [10 Items] =================
+            stage5: [
+                {
+                    id: "S5-1",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Double Comparative Error",
+                    reportTitle: "Witness Report 1: Souq Jewelry Audit",
+                    conceptCue: "Carefully inspect the report. Find the error of adding 'more' to an adjective that already has '-er'.",
+                    tokens: [
+                        { text: "The", isError: false },
+                        { text: "gold", isError: false },
+                        { text: "watch", isError: false },
+                        { text: "is", isError: false },
+                        { text: "more", isError: true, correction: "omit 'more'" },
+                        { text: "heavier", isError: false },
+                        { text: "than", isError: false },
+                        { text: "the", isError: false },
+                        { text: "silver", isError: false },
+                        { text: "ring.", isError: false }
+                    ],
+                    fullSentence: "The gold watch is more heavier than the silver ring.",
+                    explanation: "Double comparative error: 'heavier' already has the comparative suffix '-er'. Never add 'more' to '-er' adjectives."
+                },
+                {
+                    id: "S5-2",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Missing Superlative Article",
+                    reportTitle: "Geography Memo 2: Al Dakhiliyah Terrain",
+                    conceptCue: "Look for a superlative adjective that is missing the mandatory definite article 'the'.",
+                    tokens: [
+                        { text: "Jebel", isError: false },
+                        { text: "Shams", isError: false },
+                        { text: "is", isError: false },
+                        { text: "highest", isError: true, correction: "the highest" },
+                        { text: "mountain", isError: false },
+                        { text: "peak", isError: false },
+                        { text: "in", isError: false },
+                        { text: "the", isError: false },
+                        { text: "country.", isError: false }
+                    ],
+                    fullSentence: "Jebel Shams is highest mountain peak in the country.",
+                    explanation: "Missing article: Superlative adjectives require the definite article: 'the highest mountain'."
+                },
+                {
+                    id: "S5-3",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Comparative Connector Error (then vs than)",
+                    reportTitle: "Patrol Statement 3: Speed Radar Checkpoint",
+                    conceptCue: "Spot the homophone mistake where a time word is used instead of the comparative connector.",
+                    tokens: [
+                        { text: "The", isError: false },
+                        { text: "getaway", isError: false },
+                        { text: "vehicle", isError: false },
+                        { text: "was", isError: false },
+                        { text: "much", isError: false },
+                        { text: "faster", isError: false },
+                        { text: "then", isError: true, correction: "than" },
+                        { text: "the", isError: false },
+                        { text: "police", isError: false },
+                        { text: "cruiser.", isError: false }
+                    ],
+                    fullSentence: "The getaway vehicle was much faster then the police cruiser.",
+                    explanation: "Spelling error: 'then' indicates time. Comparisons strictly require 'than' ('faster than')."
+                },
+                {
+                    id: "S5-4",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Irregular Comparative Error",
+                    reportTitle: "Alibi Transcript 4: Suspect Statement",
+                    conceptCue: "Find the ungrammatical form of the irregular comparative adjective 'good'.",
+                    tokens: [
+                        { text: "My", isError: false },
+                        { text: "alibi", isError: false },
+                        { text: "is", isError: false },
+                        { text: "gooder", isError: true, correction: "better" },
+                        { text: "than", isError: false },
+                        { text: "the", isError: false },
+                        { text: "evidence", isError: false },
+                        { text: "suggests.", isError: false }
+                    ],
+                    fullSentence: "My alibi is gooder than the evidence suggests.",
+                    explanation: "Irregular form: 'good' does not take '-er'. Its comparative is 'better'."
+                },
+                {
+                    id: "S5-5",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Incorrect Equative Correlative",
+                    reportTitle: "Security Memo 5: Perimeter Sensors",
+                    conceptCue: "Spot the wrong correlative partner used with 'as...'.",
+                    tokens: [
+                        { text: "The", isError: false },
+                        { text: "back", isError: false },
+                        { text: "gate", isError: false },
+                        { text: "was", isError: false },
+                        { text: "as", isError: false },
+                        { text: "secure", isError: false },
+                        { text: "than", isError: true, correction: "as" },
+                        { text: "the", isError: false },
+                        { text: "front", isError: false },
+                        { text: "doors.", isError: false }
+                    ],
+                    fullSentence: "The back gate was as secure than the front doors.",
+                    explanation: "Correlative mismatch: The equative formula is 'as + adjective + as', never 'as + adjective + than'."
+                },
+                {
+                    id: "S5-6",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Superlative Spelling Error (CVC)",
+                    reportTitle: "Climate Log 6: Desert Outpost",
+                    conceptCue: "Look for an error in doubling the consonant in a CVC superlative.",
+                    tokens: [
+                        { text: "Yesterday", isError: false },
+                        { text: "was", isError: false },
+                        { text: "the", isError: false },
+                        { text: "hotest", isError: true, correction: "hottest" },
+                        { text: "afternoon", isError: false },
+                        { text: "of", isError: false },
+                        { text: "the", isError: false },
+                        { text: "entire", isError: false },
+                        { text: "month.", isError: false }
+                    ],
+                    fullSentence: "Yesterday was the hotest afternoon of the entire month.",
+                    explanation: "Spelling error: Single-syllable CVC adjective 'hot' must double the 't' before '-est' ('the hottest')."
+                },
+                {
+                    id: "S5-7",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Double Superlative Error",
+                    reportTitle: "Museum Inventory 7: Royal Exhibit",
+                    conceptCue: "Find the redundant use of 'most' before an adjective ending in '-est'.",
+                    tokens: [
+                        { text: "This", isError: false },
+                        { text: "is", isError: false },
+                        { text: "the", isError: false },
+                        { text: "most", isError: true, correction: "omit 'most'" },
+                        { text: "oldest", isError: false },
+                        { text: "fort", isError: false },
+                        { text: "in", isError: false },
+                        { text: "Al", isError: false },
+                        { text: "Dakhiliyah.", isError: false }
+                    ],
+                    fullSentence: "This is the most oldest fort in Al Dakhiliyah.",
+                    explanation: "Double superlative: 'oldest' already contains the superlative inflection. Using 'most oldest' is ungrammatical."
+                },
+                {
+                    id: "S5-8",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Comparative of Multi-syllable Error",
+                    reportTitle: "Courier Log 8: Road Transport",
+                    conceptCue: "Find the illegal addition of '-er' to a three-syllable adjective.",
+                    tokens: [
+                        { text: "The", isError: false },
+                        { text: "new", isError: false },
+                        { text: "highway", isError: false },
+                        { text: "is", isError: false },
+                        { text: "comfortabler", isError: true, correction: "more comfortable" },
+                        { text: "than", isError: false },
+                        { text: "the", isError: false },
+                        { text: "old", isError: false },
+                        { text: "mountain", isError: false },
+                        { text: "track.", isError: false }
+                    ],
+                    fullSentence: "The new highway is comfortabler than the old mountain track.",
+                    explanation: "Multi-syllable inflection error: 'comfortable' has 4 syllables and must form its comparative with 'more' ('more comfortable than')."
+                },
+                {
+                    id: "S5-9",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Irregular Superlative Error",
+                    reportTitle: "Detective Brief 9: Evidence Evaluation",
+                    conceptCue: "Spot the invented regular superlative form for the irregular adjective 'bad'.",
+                    tokens: [
+                        { text: "That", isError: false },
+                        { text: "was", isError: false },
+                        { text: "the", isError: false },
+                        { text: "baddest", isError: true, correction: "worst" },
+                        { text: "mistake", isError: false },
+                        { text: "the", isError: false },
+                        { text: "smugglers", isError: false },
+                        { text: "ever", isError: false },
+                        { text: "made.", isError: false }
+                    ],
+                    fullSentence: "That was the baddest mistake the smugglers ever made.",
+                    explanation: "Irregular form: The superlative of 'bad' is 'the worst'. 'Baddest' is an incorrect formation."
+                },
+                {
+                    id: "S5-10",
+                    stage: "Stage 5: Forensic Document Inspection",
+                    phase: "Superlative Domain Preposition Error",
+                    reportTitle: "Personnel File 10: Police Academy",
+                    conceptCue: "Find the wrong preposition used before a singular location/institution.",
+                    tokens: [
+                        { text: "Officer", isError: false },
+                        { text: "Aisha", isError: false },
+                        { text: "is", isError: false },
+                        { text: "the", isError: false },
+                        { text: "bravest", isError: false },
+                        { text: "detective", isError: false },
+                        { text: "of", isError: true, correction: "in" },
+                        { text: "our", isError: false },
+                        { text: "regional", isError: false },
+                        { text: "force.", isError: false }
+                    ],
+                    fullSentence: "Officer Aisha is the bravest detective of our regional force.",
+                    explanation: "Preposition error: With an institution or organization ('our regional force'), use 'in' rather than 'of'."
+                }
+            ],
+
+            // ================= STAGE 6: THE GRAND TRIAL (Sentence Scramble) [10 Items] =================
+            stage6: [
+                {
+                    id: "S6-1",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Comparative Multi-syllable",
+                    conceptCue: "Reconstruct this comparative statement: Subject + is + more expensive than + noun phrase.",
+                    words: ["The", "antique", "Khanjar", "is", "more", "expensive", "than", "the", "modern", "dagger"],
+                    correctSentence: "The antique Khanjar is more expensive than the modern dagger",
+                    explanation: "Correct order: 'The antique Khanjar is more expensive than the modern dagger' (more + multi-syllable adj + than)."
+                },
+                {
+                    id: "S6-2",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Superlative with 'in Oman'",
+                    conceptCue: "Reconstruct this superlative statement: Proper noun + is + the highest mountain + in Oman.",
+                    words: ["Jebel", "Shams", "is", "the", "highest", "mountain", "in", "the", "entire", "country"],
+                    correctSentence: "Jebel Shams is the highest mountain in the entire country",
+                    explanation: "Correct order: 'Jebel Shams is the highest mountain in the entire country' (the + -est + in + location)."
+                },
+                {
+                    id: "S6-3",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Equative Structure",
+                    conceptCue: "Reconstruct equative sentence: Subject + was + not as fast as + object.",
+                    words: ["The", "suspect's", "car", "was", "not", "as", "fast", "as", "the", "patrol"],
+                    correctSentence: "The suspect's car was not as fast as the patrol",
+                    explanation: "Correct order: 'The suspect's car was not as fast as the patrol' (not as + base adjective + as)."
+                },
+                {
+                    id: "S6-4",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Irregular Comparative 'better than'",
+                    conceptCue: "Reconstruct sentence: Scientific evidence + is + much better than + witness memory.",
+                    words: ["Scientific", "evidence", "is", "much", "better", "than", "unreliable", "witness", "memory"],
+                    correctSentence: "Scientific evidence is much better than unreliable witness memory",
+                    explanation: "Correct order: 'Scientific evidence is much better than unreliable witness memory'."
+                },
+                {
+                    id: "S6-5",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Superlative 'one of the most'",
+                    conceptCue: "Reconstruct formula: Bahla Fort + is + one of the most famous + castles + in Oman.",
+                    words: ["Bahla", "Fort", "is", "one", "of", "the", "most", "famous", "castles", "in", "Oman"],
+                    correctSentence: "Bahla Fort is one of the most famous castles in Oman",
+                    explanation: "Correct order: 'Bahla Fort is one of the most famous castles in Oman' (one of + the most + adjective + plural noun)."
+                },
+                {
+                    id: "S6-6",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Comparative with Spelling (-ier)",
+                    conceptCue: "Reconstruct comparative: The eastern desert trail + was + much bumpier than + the paved road.",
+                    words: ["The", "desert", "trail", "was", "much", "bumpier", "than", "the", "paved", "highway"],
+                    correctSentence: "The desert trail was much bumpier than the paved highway",
+                    explanation: "Correct order: 'The desert trail was much bumpier than the paved highway' (-ier + than)."
+                },
+                {
+                    id: "S6-7",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Superlative with 'of all'",
+                    conceptCue: "Reconstruct superlative with 'of all': Salim + was + the most cooperative suspect + of all.",
+                    words: ["Salim", "was", "the", "most", "cooperative", "suspect", "of", "all", "three", "men"],
+                    correctSentence: "Salim was the most cooperative suspect of all three men",
+                    explanation: "Correct order: 'Salim was the most cooperative suspect of all three men' (the most + adjective + of all)."
+                },
+                {
+                    id: "S6-8",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Irregular Superlative 'the worst'",
+                    conceptCue: "Reconstruct: A false alibi + is + the worst mistake + during + an interrogation.",
+                    words: ["A", "false", "alibi", "is", "the", "worst", "mistake", "during", "an", "investigation"],
+                    correctSentence: "A false alibi is the worst mistake during an investigation",
+                    explanation: "Correct order: 'A false alibi is the worst mistake during an investigation' (the worst + noun)."
+                },
+                {
+                    id: "S6-9",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Comparative of Distance 'farther than'",
+                    conceptCue: "Reconstruct: Nizwa + is + farther from Muscat than + Samail.",
+                    words: ["Nizwa", "is", "farther", "from", "Muscat", "than", "the", "town", "of", "Samail"],
+                    correctSentence: "Nizwa is farther from Muscat than the town of Samail",
+                    explanation: "Correct order: 'Nizwa is farther from Muscat than the town of Samail' (farther from... than...)."
+                },
+                {
+                    id: "S6-10",
+                    stage: "Stage 6: The Grand Trial",
+                    phase: "Scramble: Inferiority Degree 'less crowded than'",
+                    conceptCue: "Reconstruct: The mountain souq + was + less crowded than + the harbor market.",
+                    words: ["The", "mountain", "souq", "was", "less", "crowded", "than", "the", "harbor", "market"],
+                    correctSentence: "The mountain souq was less crowded than the harbor market",
+                    explanation: "Correct order: 'The mountain souq was less crowded than the harbor market' (less + base adjective + than)."
+                }
+            ]
+        };
+
+        function handleStartGame(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('input-name').value.trim();
+            const secInput = document.getElementById('input-section').value.trim();
+
+            if (!nameInput || !secInput) return;
+
+            GameData.studentName = nameInput;
+            GameData.studentSection = secInput;
+
+            document.getElementById('hud-name-display').textContent = GameData.studentName;
+            document.getElementById('hud-student-tag').style.display = 'flex';
+            document.getElementById('stage-nav-bar').style.display = 'block';
+
+            document.getElementById('screen-login').style.display = 'none';
+            document.getElementById('screen-gameplay').style.display = 'block';
+
+            startClassroomTimer();
+            renderCurrentQuestion();
+        }
+
+        function startClassroomTimer() {
+            GameData.timerInterval = setInterval(() => {
+                if (GameData.timerRunning && GameData.timerSeconds > 0) {
+                    GameData.timerSeconds--;
+                    const m = Math.floor(GameData.timerSeconds / 60);
+                    const s = GameData.timerSeconds % 60;
+                    document.getElementById('timer-display').textContent = 
+                        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                }
+            }, 1000);
+
+            document.getElementById('timer-toggle-btn').addEventListener('click', () => {
+                GameData.timerRunning = !GameData.timerRunning;
+                document.getElementById('timer-toggle-btn').textContent = GameData.timerRunning ? '⏸' : '▶';
+            });
+        }
+
+        function renderCurrentQuestion() {
+            // Update Stepper progress bubbles
+            for (let i = 1; i <= 6; i++) {
+                const node = document.getElementById(`step-node-${i}`);
+                node.className = 'step-bubble';
+                if (i < GameData.currentStage) node.classList.add('done');
+                if (i === GameData.currentStage) node.classList.add('current');
+            }
+
+            // Reset lock state for the new question
+            GameData.lockedAnswerForCurrent = null;
+            document.getElementById('btn-next-question').disabled = true;
+            document.getElementById('lock-status-text').textContent = "Select an option to immediately lock your answer.";
+
+            const stageNum = GameData.currentStage;
+            const qIdx = GameData.currentQuestionIdx;
+
+            document.getElementById('stage-badge-text').textContent = `STAGE ${stageNum} OF 6`;
+            document.getElementById('question-tracker').textContent = `Item ${qIdx + 1} of 10`;
+
+            const container = document.getElementById('dynamic-stage-body');
+            container.innerHTML = '';
+
+            if (stageNum === 1) renderStage1(container, qIdx);
+            else if (stageNum === 2) renderStage2(container, qIdx);
+            else if (stageNum === 3) renderStage3(container, qIdx);
+            else if (stageNum === 4) renderStage4(container, qIdx);
+            else if (stageNum === 5) renderStage5(container, qIdx);
+            else if (stageNum === 6) renderStage6(container, qIdx);
+        }
+
+        function renderStandardMCQ(container, item, stageTitle, stageDesc) {
+            document.getElementById('stage-title-text').textContent = stageTitle;
+            document.getElementById('stage-desc-text').textContent = stageDesc;
+
+            const box = document.createElement('div');
+            box.className = 'evidence-dossier-box';
+
+            box.innerHTML = `
+                <div class="concept-cue">${item.conceptCue}</div>
+                <div class="case-prompt">${item.prompt}</div>
+            `;
+
+            const optionsStack = document.createElement('div');
+            optionsStack.className = 'options-stack grid-2';
+
+            item.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <span class="lock-indicator">🔒 LOCKED</span>
+                `;
+
+                btn.onclick = () => {
+                    if (GameData.lockedAnswerForCurrent !== null) return; // STRICT LOCK: ONE ATTEMPT ONLY
+
+                    audio.lockSound();
+                    GameData.lockedAnswerForCurrent = opt;
+
+                    btn.classList.add('is-locked');
+                    optionsStack.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+
+                    document.getElementById('lock-status-text').textContent = "Answer submitted and locked. Proceed to next item.";
+                    document.getElementById('btn-next-question').disabled = false;
+                };
+
+                optionsStack.appendChild(btn);
+            });
+
+            box.appendChild(optionsStack);
+            container.appendChild(box);
+        }
+
+        function renderStage1(container, idx) {
+            renderStandardMCQ(
+                container, 
+                GameData.stage1[idx], 
+                "Stage 1: The Baseline Ledger", 
+                "Positive Degree & Equatives: Mastering base descriptive adjectives, as... as, and not as... as."
+            );
+        }
+
+        function renderStage2(container, idx) {
+            renderStandardMCQ(
+                container, 
+                GameData.stage2[idx], 
+                "Stage 2: The Two-Suspect Matrix", 
+                "Comparative Degree: Drilling -er / more + than, spelling changes (-ier, CVC doubling), and irregulars."
+            );
+        }
+
+        function renderStage3(container, idx) {
+            renderStandardMCQ(
+                container, 
+                GameData.stage3[idx], 
+                "Stage 3: The Supreme Suspect", 
+                "Superlative Degree: Identifying extreme elements using the -est / the most, plus 'in' vs 'of'."
+            );
+        }
+
+        function renderStage4(container, idx) {
+            document.getElementById('stage-title-text').textContent = "Stage 4: Cross-Examination Matrix";
+            document.getElementById('stage-desc-text').textContent = "Multi-Clause Comparisons: Equatives, comparatives, and superlatives combined in complete crime contexts.";
+
+            const item = GameData.stage4[idx];
+            const box = document.createElement('div');
+            box.className = 'evidence-dossier-box';
+
+            box.innerHTML = `
+                <div class="concept-cue">${item.conceptCue}</div>
+                <div class="multi-gap-sentence">
+                    <span>${item.clauseA_prefix}</span>
+                    <select id="s4-select-1" class="case-select">
+                        <option value="">-- select clause 1 --</option>
+                        ${item.gap1_options.map(o => `<option value="${o}">${o}</option>`).join('')}
+                    </select>
+                    <span>${item.clause_mid}</span>
+                    <select id="s4-select-2" class="case-select">
+                        <option value="">-- select clause 2 --</option>
+                        ${item.gap2_options.map(o => `<option value="${o}">${o}</option>`).join('')}
+                    </select>
+                    <span>${item.clause_end}</span>
+                </div>
+                <div style="text-align: right;">
+                    <button id="btn-lock-s4" class="btn-proceed" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                        Lock Clause Selections 🔒
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(box);
+
+            const sel1 = box.querySelector('#s4-select-1');
+            const sel2 = box.querySelector('#s4-select-2');
+            const lockBtn = box.querySelector('#btn-lock-s4');
+
+            lockBtn.onclick = () => {
+                if (!sel1.value || !sel2.value) {
+                    showToast("Please choose options for both comparison gaps before locking.");
+                    return;
+                }
+
+                audio.lockSound();
+                sel1.disabled = true;
+                sel2.disabled = true;
+                lockBtn.disabled = true;
+
+                GameData.lockedAnswerForCurrent = `${sel1.value} | ${sel2.value}`;
+                document.getElementById('lock-status-text').textContent = "Clause selections locked. You can now proceed.";
+                document.getElementById('btn-next-question').disabled = false;
+            };
+        }
+
+        function renderStage5(container, idx) {
+            document.getElementById('stage-title-text').textContent = "Stage 5: Forensic Document Inspection";
+            document.getElementById('stage-desc-text').textContent = "Spot the Error: Click directly on the single grammatical error in the comparison alibi report.";
+
+            const item = GameData.stage5[idx];
+            const box = document.createElement('div');
+            box.className = 'evidence-dossier-box';
+
+            box.innerHTML = `
+                <div style="color: var(--accent-gold); font-weight: 700; margin-bottom: 0.5rem;">${item.reportTitle}</div>
+                <div class="concept-cue">${item.conceptCue}</div>
+            `;
+
+            const textCard = document.createElement('div');
+            textCard.className = 'forensic-text-card';
+
+            item.tokens.forEach(token => {
+                const span = document.createElement('span');
+                span.className = 'forensic-token';
+                span.textContent = token.text + ' ';
+
+                span.onclick = () => {
+                    if (GameData.lockedAnswerForCurrent !== null) return; // ONE ATTEMPT ONLY
+
+                    audio.lockSound();
+                    span.classList.add('selected-locked');
+                    GameData.lockedAnswerForCurrent = token.text.replace(/[^a-zA-Z]/g, '');
+
+                    textCard.querySelectorAll('.forensic-token').forEach(t => t.classList.add('locked'));
+                    document.getElementById('lock-status-text').textContent = `Locked target "${token.text}". Click below to continue.`;
+                    document.getElementById('btn-next-question').disabled = false;
+                };
+
+                textCard.appendChild(span);
+            });
+
+            box.appendChild(textCard);
+            container.appendChild(box);
+        }
+
+        function renderStage6(container, idx) {
+            document.getElementById('stage-title-text').textContent = "Stage 6: The Grand Trial";
+            document.getElementById('stage-desc-text').textContent = "Sentence Scramble: Click word tiles to reconstruct accurate comparative and superlative sentences.";
+
+            const item = GameData.stage6[idx];
+            const box = document.createElement('div');
+            box.className = 'evidence-dossier-box';
+
+            box.innerHTML = `
+                <div class="concept-cue">${item.conceptCue}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem;">Constructed Statement:</div>
+                <div class="scramble-target" id="scramble-dropzone">
+                    <span style="color: #475569; font-style: italic;" id="empty-placeholder">Click tiles below in sequence...</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem;">Available Word Tiles:</div>
+                <div class="scramble-pool" id="scramble-pool"></div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button id="btn-reset-scramble" class="btn-proceed" style="background: #334155; color: #fff; font-size: 0.85rem; padding: 0.5rem 1rem;">
+                        Reset Tiles ↺
+                    </button>
+                    <button id="btn-lock-scramble" class="btn-proceed" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                        Lock Reconstructed Statement 🔒
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(box);
+
+            const dropzone = box.querySelector('#scramble-dropzone');
+            const pool = box.querySelector('#scramble-pool');
+            const placeholder = box.querySelector('#empty-placeholder');
+            const resetBtn = box.querySelector('#btn-reset-scramble');
+            const lockBtn = box.querySelector('#btn-lock-scramble');
+
+            const shuffled = [...item.words].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(w => {
+                const tile = document.createElement('span');
+                tile.className = 'tile-word';
+                tile.textContent = w;
+                tile.dataset.word = w;
+
+                tile.onclick = () => {
+                    if (lockBtn.disabled) return;
+                    audio.playTone(350, 'sine', 0.05, 0.08);
+
+                    if (tile.parentElement === pool) {
+                        placeholder.style.display = 'none';
+                        dropzone.appendChild(tile);
+                    } else {
+                        pool.appendChild(tile);
+                        if (dropzone.children.length === 1) placeholder.style.display = 'inline';
+                    }
+                };
+
+                pool.appendChild(tile);
+            });
+
+            resetBtn.onclick = () => {
+                if (lockBtn.disabled) return;
+                dropzone.querySelectorAll('.tile-word').forEach(t => pool.appendChild(t));
+                placeholder.style.display = 'inline';
+            };
+
+            lockBtn.onclick = () => {
+                const wordsInDrop = Array.from(dropzone.querySelectorAll('.tile-word')).map(t => t.dataset.word);
+                if (wordsInDrop.length < item.words.length) {
+                    showToast(`Please sequence all ${item.words.length} words before locking.`);
+                    return;
+                }
+
+                audio.lockSound();
+                GameData.lockedAnswerForCurrent = wordsInDrop.join(' ');
+
+                lockBtn.disabled = true;
+                resetBtn.disabled = true;
+                dropzone.querySelectorAll('.tile-word').forEach(t => t.classList.add('locked'));
+
+                document.getElementById('lock-status-text').textContent = "Sentence locked. Proceed to next item.";
+                document.getElementById('btn-next-question').disabled = false;
+            };
+        }
+
+        function handleProceedNext() {
+            audio.advanceSound();
+
+            const stageNum = GameData.currentStage;
+            const qIdx = GameData.currentQuestionIdx;
+
+            let sourceItem = null;
+            let expected = null;
+            let isCorrect = false;
+
+            if (stageNum === 1) {
+                sourceItem = GameData.stage1[qIdx];
+                expected = sourceItem.correct;
+                isCorrect = (GameData.lockedAnswerForCurrent === expected);
+            } else if (stageNum === 2) {
+                sourceItem = GameData.stage2[qIdx];
+                expected = sourceItem.correct;
+                isCorrect = (GameData.lockedAnswerForCurrent === expected);
+            } else if (stageNum === 3) {
+                sourceItem = GameData.stage3[qIdx];
+                expected = sourceItem.correct;
+                isCorrect = (GameData.lockedAnswerForCurrent === expected);
+            } else if (stageNum === 4) {
+                sourceItem = GameData.stage4[qIdx];
+                expected = `${sourceItem.correct1} | ${sourceItem.correct2}`;
+                isCorrect = (GameData.lockedAnswerForCurrent === expected);
+            } else if (stageNum === 5) {
+                sourceItem = GameData.stage5[qIdx];
+                const errorToken = sourceItem.tokens.find(t => t.isError);
+                expected = errorToken ? errorToken.text.replace(/[^a-zA-Z]/g, '') : "";
+                isCorrect = (GameData.lockedAnswerForCurrent.toLowerCase() === expected.toLowerCase());
+            } else if (stageNum === 6) {
+                sourceItem = GameData.stage6[qIdx];
+                expected = sourceItem.correctSentence;
+                isCorrect = (GameData.lockedAnswerForCurrent.trim().toLowerCase() === expected.trim().toLowerCase());
+            }
+
+            GameData.userSubmissions.push({
+                stage: sourceItem.stage,
+                phase: sourceItem.phase,
+                prompt: sourceItem.prompt || sourceItem.fullSentence || sourceItem.correctSentence,
+                studentChoice: GameData.lockedAnswerForCurrent,
+                correctAnswer: expected,
+                isCorrect: isCorrect,
+                explanation: sourceItem.explanation
+            });
+
+            if (GameData.currentQuestionIdx < 9) {
+                GameData.currentQuestionIdx++;
+                renderCurrentQuestion();
+            } else {
+                if (GameData.currentStage < 6) {
+                    GameData.currentStage++;
+                    GameData.currentQuestionIdx = 0;
+                    renderCurrentQuestion();
+                } else {
+                    renderFinalDossier();
+                }
+            }
+        }
+
+        function renderFinalDossier() {
+            clearInterval(GameData.timerInterval);
+            audio.fanfare();
+
+            document.getElementById('screen-gameplay').style.display = 'none';
+            document.getElementById('screen-dossier').style.display = 'block';
+            document.getElementById('step-node-7').classList.add('done', 'current');
+
+            const totalItems = GameData.userSubmissions.length; // 60
+            const correctCount = GameData.userSubmissions.filter(s => s.isCorrect).length;
+            const percentage = Math.round((correctCount / totalItems) * 100);
+
+            document.getElementById('dossier-student-name').textContent = GameData.studentName;
+            document.getElementById('dossier-student-section').textContent = GameData.studentSection;
+            document.getElementById('dossier-score-text').textContent = `${correctCount} / ${totalItems} (${percentage}%)`;
+
+            const rankBox = document.getElementById('dossier-rank-container');
+            let rankClass = "rating-cadet";
+            let rankTitle = "Cadet in Training (<70%)";
+
+            if (percentage >= 85) {
+                rankClass = "rating-master";
+                rankTitle = "Master Forensic Grammarian (85%+ Exceptional)";
+            } else if (percentage >= 70) {
+                rankClass = "rating-senior";
+                rankTitle = "Senior Investigator (70–84% Competent)";
+            }
+
+            rankBox.innerHTML = `<span class="rating-badge ${rankClass}">🎖️ ${rankTitle}</span>`;
+
+            const tbody = document.getElementById('dossier-table-body');
+            tbody.innerHTML = '';
+
+            GameData.userSubmissions.forEach((sub, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${idx + 1}</strong></td>
+                    <td>
+                        <div style="font-weight: 700; color: var(--accent-gold);">${sub.stage}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">${sub.phase}</div>
+                    </td>
+                    <td>${sub.prompt}</td>
+                    <td>
+                        <span class="status-pill ${sub.isCorrect ? 'correct' : 'incorrect'}">
+                            ${sub.isCorrect ? '✓' : '✗'} ${sub.studentChoice}
+                        </span>
+                    </td>
+                    <td style="color: #38bdf8; font-weight: 600;">${sub.correctAnswer}</td>
+                    <td style="font-size: 0.82rem; color: #cbd5e1;">${sub.explanation}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
